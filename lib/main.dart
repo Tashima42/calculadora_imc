@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+//TODO: Adicionar comentarios no que ainda falta
+
 void main() {
   runApp(MaterialApp(
     title: 'Calculadora de IMC',
@@ -19,6 +21,8 @@ class _calcImcState extends State<calcImc> {
   TextEditingController pesoController = TextEditingController();
   TextEditingController alturaController = TextEditingController();
 
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   void resetarCampos() {
     pesoController.text = "";
     alturaController.text = "";
@@ -27,26 +31,25 @@ class _calcImcState extends State<calcImc> {
     });
   }
 
-  void _calcular(){
+  void _calcular() {
     double _peso = double.parse(pesoController.text);
     double _altura = double.parse(alturaController.text) / 100;
 
     double _imc = _peso / (_altura * _altura);
-    print(_imc);
 
     setState(() {
-      if(_imc<18.5){
-        _infoTexto = "Abaixo do Peso";
-      }else if(_imc>=18.5 && _imc<25){
-        _infoTexto = "Peso Normal";
-      }else if(_imc>=25 && _imc<30){
-        _infoTexto = "Sobrepeso";
-      }else if(_imc>=30 && _imc<35){
-        _infoTexto = "Obesidade Grau 1";
-      }else if(_imc>=35 && _imc<40){
-        _infoTexto = "Obesidade Grau 2";
-      }else if(_imc>=40){
-        _infoTexto = "Obesidade Grau 3";
+      if (_imc < 18.5) {
+        _infoTexto = "Abaixo do Peso (${_imc.toStringAsPrecision(3)})";
+      } else if (_imc >= 18.5 && _imc < 25) {
+        _infoTexto = "Peso Normal (${_imc.toStringAsPrecision(3)})";
+      } else if (_imc >= 25 && _imc < 30) {
+        _infoTexto = "Sobrepeso (${_imc.toStringAsPrecision(3)})";
+      } else if (_imc >= 30 && _imc < 35) {
+        _infoTexto = "Obesidade Grau 1 (${_imc.toStringAsPrecision(3)})";
+      } else if (_imc >= 35 && _imc < 40) {
+        _infoTexto = "Obesidade Grau 2 (${_imc.toStringAsPrecision(3)})";
+      } else if (_imc >= 40) {
+        _infoTexto = "Obesidade Grau 3 (${_imc.toStringAsPrecision(3)})";
       }
     });
   }
@@ -72,70 +75,88 @@ class _calcImcState extends State<calcImc> {
       //inicia o body
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-        child: Column(
-          //Define o alinhamento para que tudo ocupe o maximo de espaco
-          //possivel no eixo horizontal
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            //Adiciona um icone de uma pessoa, que nao fica esticado porque
-            //seu tamanho foi especificado
-            Icon(
-              Icons.person_outline,
-              color: Colors.green[500],
-              size: 120.0,
-            ),
-            //Insere Input de peso
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Peso (kg)",
-                labelStyle: TextStyle(color: Colors.green[500], fontSize: 20.0),
-              ),
-              textAlign: TextAlign.center,
-              style: TextStyle(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            //Define o alinhamento para que tudo ocupe o maximo de espaco
+            //possivel no eixo horizontal
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              //Adiciona um icone de uma pessoa, que nao fica esticado porque
+              //seu tamanho foi especificado
+              Icon(
+                Icons.person_outline,
                 color: Colors.green[500],
-                fontSize: 25.0,
+                size: 120.0,
               ),
-              controller: pesoController,
-            ),
-            //Insere Input de altura
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Altura(cm)",
-                labelStyle: TextStyle(
-                  color: Colors.green[500],
-                  fontSize: 20.0,
+              //Insere Input de peso
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Peso (kg)",
+                  labelStyle:
+                      TextStyle(color: Colors.green[500], fontSize: 20.0),
                 ),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.green[500],
+                  fontSize: 25.0,
+                ),
+                controller: pesoController,
+                validator: (value){
+                  if(value.isEmpty){
+                    return "Insira seu Peso";
+                  }
+                },
               ),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.green[500],
-                fontSize: 25.0,
-              ),
-              controller: alturaController,
-            ),
-            //Insere um botao para calcular
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 50.0,
-                child: RaisedButton(
-                  onPressed: _calcular,
-                  child: Text(
-                    "Calcular",
-                    style: TextStyle(color: Colors.white, fontSize: 25.0),
+              //Insere Input de altura
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Altura(cm)",
+                  labelStyle: TextStyle(
+                    color: Colors.green[500],
+                    fontSize: 20.0,
                   ),
+                ),
+                textAlign: TextAlign.center,
+                style: TextStyle(
                   color: Colors.green[500],
+                  fontSize: 25.0,
+                ),
+                controller: alturaController,
+                validator: (value){
+                  if(value.isEmpty){
+                    return "Insira sua Altura";
+                  }
+                },
+              ),
+              //Insere um botao para calcular
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 50.0,
+                  child: RaisedButton(
+                    onPressed: (){
+                      if(_formKey.currentState.validate()){
+                        _calcular();
+                      }
+                    },
+                    child: Text(
+                      "Calcular",
+                      style: TextStyle(color: Colors.white, fontSize: 25.0),
+                    ),
+                    color: Colors.green[500],
+                  ),
                 ),
               ),
-            ),
-            Text(
-              _infoTexto,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.green[500], fontSize: 25.0),
-            )
-          ],
+              Text(
+                _infoTexto,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.green[500], fontSize: 25.0),
+              )
+            ],
+          ),
         ),
       ),
     );
