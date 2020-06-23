@@ -1,117 +1,143 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MaterialApp(
+    title: 'Calculadora de IMC',
+    home: calcImc(), //inicia o statefull widget da pagina inicial
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class calcImc extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
+  _calcImcState createState() => _calcImcState();
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class _calcImcState extends State<calcImc> {
+  //Definindo as variaveis
+  String _infoTexto = "Insira seus dados";
+  //Definindo os controllers
+  TextEditingController pesoController = TextEditingController();
+  TextEditingController alturaController = TextEditingController();
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
+  void resetarCampos() {
+    pesoController.text = "";
+    alturaController.text = "";
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _infoTexto = "Insira seus dados";
+    });
+  }
+
+  void _calcular(){
+    double _peso = double.parse(pesoController.text);
+    double _altura = double.parse(alturaController.text) / 100;
+
+    double _imc = _peso / (_altura * _altura);
+    print(_imc);
+
+    setState(() {
+      if(_imc<18.5){
+        _infoTexto = "Abaixo do Peso";
+      }else if(_imc>=18.5 && _imc<25){
+        _infoTexto = "Peso Normal";
+      }else if(_imc>=25 && _imc<30){
+        _infoTexto = "Sobrepeso";
+      }else if(_imc>=30 && _imc<35){
+        _infoTexto = "Obesidade Grau 1";
+      }else if(_imc>=35 && _imc<40){
+        _infoTexto = "Obesidade Grau 2";
+      }else if(_imc>=40){
+        _infoTexto = "Obesidade Grau 3";
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
+      //inicia a AppBar do app
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text("Calculadora de IMC"), //Texto da parte superior
+        centerTitle: true, //Centraliza o texto
+        backgroundColor: Colors.green[500], //Define a cor para verde
+        //onde os widgets da appbar com acoes ficam
+        actions: <Widget>[
+          //adiciona um botao com um icone de refresh
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: resetarCampos,
+          ),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      backgroundColor: Colors.white, //Define branco como a cor de fundo
+      //inicia o body
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
+          //Define o alinhamento para que tudo ocupe o maximo de espaco
+          //possivel no eixo horizontal
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            //Adiciona um icone de uma pessoa, que nao fica esticado porque
+            //seu tamanho foi especificado
+            Icon(
+              Icons.person_outline,
+              color: Colors.green[500],
+              size: 120.0,
+            ),
+            //Insere Input de peso
+            TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Peso (kg)",
+                labelStyle: TextStyle(color: Colors.green[500], fontSize: 20.0),
+              ),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.green[500],
+                fontSize: 25.0,
+              ),
+              controller: pesoController,
+            ),
+            //Insere Input de altura
+            TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Altura(cm)",
+                labelStyle: TextStyle(
+                  color: Colors.green[500],
+                  fontSize: 20.0,
+                ),
+              ),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.green[500],
+                fontSize: 25.0,
+              ),
+              controller: alturaController,
+            ),
+            //Insere um botao para calcular
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                height: 50.0,
+                child: RaisedButton(
+                  onPressed: _calcular,
+                  child: Text(
+                    "Calcular",
+                    style: TextStyle(color: Colors.white, fontSize: 25.0),
+                  ),
+                  color: Colors.green[500],
+                ),
+              ),
             ),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+              _infoTexto,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.green[500], fontSize: 25.0),
+            )
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
